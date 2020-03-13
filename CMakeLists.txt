@@ -21,13 +21,9 @@ if (${USE_ORIGINAL})
             src/hijack_call.c
             include/hijack.h
             include/cuda-subset.h
-            include/nvml-subset.h
             include/cuda-helper.h
-            include/nvml-helper.h
             src/cuda_originals.c
-            src/nvml_entry.c
-            src/loader.c
-            src/register.c)
+            src/loader.c)
 
     target_link_libraries(cuda-control ${STATIC_C_LIBRARIES})
 
@@ -37,13 +33,9 @@ else (NOT ${USE_ORIGINAL})
             src/hijack_call.c
             include/hijack.h
             include/cuda-subset.h
-            include/nvml-subset.h
             include/cuda-helper.h
-            include/nvml-helper.h
             src/cuda_originals.c
-            src/nvml_entry.c
-            src/loader.c
-            src/register.c)
+            src/loader.c)
 
     target_link_libraries(cuda-control ${STATIC_C_LIBRARIES})
 
