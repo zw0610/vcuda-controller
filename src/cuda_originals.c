@@ -2364,3 +2364,76 @@ CUresult cuMemSetAccess(CUdeviceptr ptr, size_t size,
 CUresult cuMemUnmap(CUdeviceptr ptr, size_t size) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemUnmap, ptr, size);
 }
+
+/* move kernel luanch related function in cuda_originals.c */
+
+CUresult cuLaunchKernel_ptsz(CUfunction f, unsigned int gridDimX,
+                             unsigned int gridDimY, unsigned int gridDimZ,
+                             unsigned int blockDimX, unsigned int blockDimY,
+                             unsigned int blockDimZ,
+                             unsigned int sharedMemBytes, CUstream hStream,
+                             void **kernelParams, void **extra) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel_ptsz, f, gridDimX,
+                         gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
+                         sharedMemBytes, hStream, kernelParams, extra);
+}
+
+CUresult cuLaunchKernel(CUfunction f, unsigned int gridDimX,
+                        unsigned int gridDimY, unsigned int gridDimZ,
+                        unsigned int blockDimX, unsigned int blockDimY,
+                        unsigned int blockDimZ, unsigned int sharedMemBytes,
+                        CUstream hStream, void **kernelParams, void **extra) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel, f, gridDimX,
+                         gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
+                         sharedMemBytes, hStream, kernelParams, extra);
+}
+
+CUresult cuLaunch(CUfunction f) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunch, f);
+}
+
+CUresult cuLaunchCooperativeKernel_ptsz(
+    CUfunction f, unsigned int gridDimX, unsigned int gridDimY,
+    unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY,
+    unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream,
+    void **kernelParams) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel_ptsz, f,
+                         gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
+                         blockDimZ, sharedMemBytes, hStream, kernelParams);
+}
+
+CUresult cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX,
+                                   unsigned int gridDimY, unsigned int gridDimZ,
+                                   unsigned int blockDimX,
+                                   unsigned int blockDimY,
+                                   unsigned int blockDimZ,
+                                   unsigned int sharedMemBytes,
+                                   CUstream hStream, void **kernelParams) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel, f,
+                         gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
+                         blockDimZ, sharedMemBytes, hStream, kernelParams);
+}
+
+CUresult cuLaunchGrid(CUfunction f, int grid_width, int grid_height) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchGrid, f, grid_width,
+                         grid_height);
+}
+
+CUresult cuLaunchGridAsync(CUfunction f, int grid_width, int grid_height,
+                           CUstream hStream) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchGridAsync, f, grid_width,
+                         grid_height, hStream);
+}
+
+CUresult cuFuncSetBlockShape(CUfunction hfunc, int x, int y, int z) {
+  
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuFuncSetBlockShape, hfunc, x, y,
+                         z);
+}
