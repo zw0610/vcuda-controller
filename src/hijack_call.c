@@ -26,7 +26,6 @@
 
 #include "include/cuda-helper.h"
 #include "include/hijack.h"
-#include "include/nvml-helper.h"
 
 extern resource_data_t g_vcuda_config;
 extern entry_t cuda_library_entry[];
