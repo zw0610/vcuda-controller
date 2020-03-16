@@ -1,11 +1,12 @@
 /*
- * Tencent is pleased to support the open source community by making TKEStack available.
+ * Tencent is pleased to support the open source community by making TKEStack
+ * available.
  *
  * Copyright (C) 2012-2019 Tencent. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
- * this file except in compliance with the License. You may obtain a copy of the
- * License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * https://opensource.org/licenses/Apache-2.0
  *
@@ -1506,6 +1507,24 @@ CUresult cuMemcpyAtoA(CUarray dstArray, size_t dstOffset, CUarray srcArray,
                          srcArray, srcOffset, ByteCount);
 }
 
+CUresult cuMemcpyAtoD(CUdeviceptr dstDevice, CUarray srcArray, size_t srcOffset,
+                      size_t ByteCount) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyAtoD, dstDevice, srcArray,
+                         srcOffset, ByteCount);
+}
+
+CUresult cuMemcpyAtoD_v2(CUdeviceptr dstDevice, CUarray srcArray,
+                         size_t srcOffset, size_t ByteCount) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyAtoD_v2, dstDevice,
+                         srcArray, srcOffset, ByteCount);
+}
+
+CUresult cuMemcpyAtoD_v2_ptds(CUdeviceptr dstDevice, CUarray srcArray,
+                              size_t srcOffset, size_t ByteCount) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyAtoD_v2_ptds, dstDevice,
+                         srcArray, srcOffset, ByteCount);
+}
+
 CUresult cuMemcpyAtoH_v2_ptds(void *dstHost, CUarray srcArray, size_t srcOffset,
                               size_t ByteCount) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyAtoH_v2_ptds, dstHost,
@@ -2238,4 +2257,183 @@ CUresult cuStreamGetCaptureInfo_ptsz(CUstream hStream,
 CUresult cuThreadExchangeStreamCaptureMode(CUstreamCaptureMode *mode) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuThreadExchangeStreamCaptureMode,
                          mode);
+}
+
+CUresult cuDeviceGetNvSciSyncAttributes(void *nvSciSyncAttrList, CUdevice dev,
+                                        int flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceGetNvSciSyncAttributes,
+                         nvSciSyncAttrList, dev, flags);
+}
+
+CUresult cuGraphExecHostNodeSetParams(CUgraphExec hGraphExec, CUgraphNode hNode,
+                                      const CUDA_HOST_NODE_PARAMS *nodeParams) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphExecHostNodeSetParams,
+                         hGraphExec, hNode, nodeParams);
+}
+
+CUresult cuGraphExecMemcpyNodeSetParams(CUgraphExec hGraphExec,
+                                        CUgraphNode hNode,
+                                        const CUDA_MEMCPY3D *copyParams,
+                                        CUcontext ctx) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphExecMemcpyNodeSetParams,
+                         hGraphExec, hNode, copyParams, ctx);
+}
+
+CUresult cuGraphExecMemsetNodeSetParams(
+    CUgraphExec hGraphExec, CUgraphNode hNode,
+    const CUDA_MEMSET_NODE_PARAMS *memsetParams, CUcontext ctx) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphExecMemsetNodeSetParams,
+                         hGraphExec, hNode, memsetParams, ctx);
+}
+
+CUresult cuGraphExecUpdate(CUgraphExec hGraphExec, CUgraph hGraph,
+                           CUgraphNode *hErrorNode_out,
+                           CUgraphExecUpdateResult *updateResult_out) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphExecUpdate, hGraphExec,
+                         hGraph, hErrorNode_out, updateResult_out);
+}
+
+CUresult cuMemAddressFree(CUdeviceptr ptr, size_t size) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemAddressFree, ptr, size);
+}
+
+CUresult cuMemAddressReserve(CUdeviceptr *ptr, size_t size, size_t alignment,
+                             CUdeviceptr addr, unsigned long long flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemAddressReserve, ptr, size,
+                         alignment, addr, flags);
+}
+
+CUresult cuMemCreate(CUmemGenericAllocationHandle *handle, size_t size,
+                     const CUmemAllocationProp *prop,
+                     unsigned long long flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemCreate, handle, size, prop,
+                         flags);
+}
+
+CUresult cuMemExportToShareableHandle(void *shareableHandle,
+                                      CUmemGenericAllocationHandle handle,
+                                      CUmemAllocationHandleType handleType,
+                                      unsigned long long flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemExportToShareableHandle,
+                         shareableHandle, handle, handleType, flags);
+}
+
+CUresult cuMemGetAccess(unsigned long long *flags,
+                        const CUmemLocation *location, CUdeviceptr ptr) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetAccess, flags, location,
+                         ptr);
+}
+
+CUresult cuMemGetAllocationGranularity(
+    size_t *granularity, const CUmemAllocationProp *prop,
+    CUmemAllocationGranularity_flags option) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetAllocationGranularity,
+                         granularity, prop, option);
+}
+
+CUresult cuMemGetAllocationPropertiesFromHandle(
+    CUmemAllocationProp *prop, CUmemGenericAllocationHandle handle) {
+  return CUDA_ENTRY_CALL(cuda_library_entry,
+                         cuMemGetAllocationPropertiesFromHandle, prop, handle);
+}
+
+CUresult cuMemImportFromShareableHandle(
+    CUmemGenericAllocationHandle *handle, void *osHandle,
+    CUmemAllocationHandleType shHandleType) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemImportFromShareableHandle,
+                         handle, osHandle, shHandleType);
+}
+
+CUresult cuMemMap(CUdeviceptr ptr, size_t size, size_t offset,
+                  CUmemGenericAllocationHandle handle,
+                  unsigned long long flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemMap, ptr, size, offset,
+                         handle, flags);
+}
+
+CUresult cuMemRelease(CUmemGenericAllocationHandle handle) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemRelease, handle);
+}
+
+CUresult cuMemSetAccess(CUdeviceptr ptr, size_t size,
+                        const CUmemAccessDesc *desc, size_t count) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemSetAccess, ptr, size, desc,
+                         count);
+}
+
+CUresult cuMemUnmap(CUdeviceptr ptr, size_t size) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemUnmap, ptr, size);
+}
+
+/* move kernel luanch related function in cuda_originals.c */
+
+CUresult cuLaunchKernel_ptsz(CUfunction f, unsigned int gridDimX,
+                             unsigned int gridDimY, unsigned int gridDimZ,
+                             unsigned int blockDimX, unsigned int blockDimY,
+                             unsigned int blockDimZ,
+                             unsigned int sharedMemBytes, CUstream hStream,
+                             void **kernelParams, void **extra) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel_ptsz, f, gridDimX,
+                         gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
+                         sharedMemBytes, hStream, kernelParams, extra);
+}
+
+CUresult cuLaunchKernel(CUfunction f, unsigned int gridDimX,
+                        unsigned int gridDimY, unsigned int gridDimZ,
+                        unsigned int blockDimX, unsigned int blockDimY,
+                        unsigned int blockDimZ, unsigned int sharedMemBytes,
+                        CUstream hStream, void **kernelParams, void **extra) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel, f, gridDimX,
+                         gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
+                         sharedMemBytes, hStream, kernelParams, extra);
+}
+
+CUresult cuLaunch(CUfunction f) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunch, f);
+}
+
+CUresult cuLaunchCooperativeKernel_ptsz(
+    CUfunction f, unsigned int gridDimX, unsigned int gridDimY,
+    unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY,
+    unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream,
+    void **kernelParams) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel_ptsz, f,
+                         gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
+                         blockDimZ, sharedMemBytes, hStream, kernelParams);
+}
+
+CUresult cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX,
+                                   unsigned int gridDimY, unsigned int gridDimZ,
+                                   unsigned int blockDimX,
+                                   unsigned int blockDimY,
+                                   unsigned int blockDimZ,
+                                   unsigned int sharedMemBytes,
+                                   CUstream hStream, void **kernelParams) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel, f,
+                         gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
+                         blockDimZ, sharedMemBytes, hStream, kernelParams);
+}
+
+CUresult cuLaunchGrid(CUfunction f, int grid_width, int grid_height) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchGrid, f, grid_width,
+                         grid_height);
+}
+
+CUresult cuLaunchGridAsync(CUfunction f, int grid_width, int grid_height,
+                           CUstream hStream) {
+
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchGridAsync, f, grid_width,
+                         grid_height, hStream);
+}
+
+CUresult cuFuncSetBlockShape(CUfunction hfunc, int x, int y, int z) {
+  
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuFuncSetBlockShape, hfunc, x, y,
+                         z);
 }
