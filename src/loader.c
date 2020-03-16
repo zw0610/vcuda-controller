@@ -491,7 +491,7 @@ static void load_single_cuda_function(int idx) {
     char cuda_filename[FILENAME_MAX];
 
     snprintf(cuda_filename, FILENAME_MAX - 1, "%s.%s", CUDA_LIBRARY_PREFIX,
-           driver_version);
+            driver_version);
     cuda_filename[FILENAME_MAX - 1] = '\0';
 
     table = dlopen(cuda_filename, RTLD_NOW | RTLD_NODELETE);
@@ -535,61 +535,64 @@ void load_libcuda() {
     dlclose(table);
 }
 
-// static void matchRegex(const char *pattern, const char *matchString,
-//                        char *version) {
-//   regex_t regex;
-//   int reti;
-//   regmatch_t matches[1];
-//   char msgbuf[512];
+static void matchRegex(const char *pattern, const char *matchString,
+                       char *version) {
+  regex_t regex;
+  int reti;
+  regmatch_t matches[1];
+  char msgbuf[512];
 
-//   reti = regcomp(&regex, pattern, REG_EXTENDED);
-//   if (reti) {
-//     LOGGER(4, "Could not compile regex: %s", DRIVER_VERSION_MATCH_PATTERN);
-//     return;
-//   }
+  reti = regcomp(&regex, pattern, REG_EXTENDED);
+  if (reti) {
+    LOGGER(4, "Could not compile regex: %s", DRIVER_VERSION_MATCH_PATTERN);
+    return;
+  }
 
-//   reti = regexec(&regex, matchString, 1, matches, 0);
-//   switch (reti) {
-//     case 0:
-//       strncpy(version, matchString + matches[0].rm_so,
-//               matches[0].rm_eo - matches[0].rm_so);
-//       version[matches[0].rm_eo - matches[0].rm_so] = '\0';
-//       break;
-//     case REG_NOMATCH:
-//       LOGGER(4, "Regex does not match for string: %s", matchString);
-//       break;
-//     default:
-//       regerror(reti, &regex, msgbuf, sizeof(msgbuf));
-//       LOGGER(4, "Regex match failed: %s", msgbuf);
-//   }
+  reti = regexec(&regex, matchString, 1, matches, 0);
+  switch (reti) {
+    case 0:
+      strncpy(version, matchString + matches[0].rm_so,
+              matches[0].rm_eo - matches[0].rm_so);
+      version[matches[0].rm_eo - matches[0].rm_so] = '\0';
+      break;
+    case REG_NOMATCH:
+      LOGGER(4, "Regex does not match for string: %s", matchString);
+      break;
+    default:
+      regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+      LOGGER(4, "Regex match failed: %s", msgbuf);
+  }
 
-//   regfree(&regex);
-//   return;
-// }
+  regfree(&regex);
+  return;
+}
 
-// static void read_version_from_proc(char *version) {
-//   char *line = NULL;
-//   size_t len = 0;
+static void read_version_from_proc(char *version) {
+  char *line = NULL;
+  size_t len = 0;
 
-//   FILE *fp = fopen(DRIVER_VERSION_PROC_PATH, "r");
-//   if (fp == NULL) {
-//     LOGGER(4, "can't open %s, error %s", DRIVER_VERSION_PROC_PATH,
-//            strerror(errno));
-//     return;
-//   }
+  FILE *fp = fopen(DRIVER_VERSION_PROC_PATH, "r");
+  if (fp == NULL) {
+    LOGGER(4, "can't open %s, error %s", DRIVER_VERSION_PROC_PATH,
+           strerror(errno));
+    return;
+  }
 
-//   while ((getline(&line, &len, fp) != -1)) {
-//     if (strncmp(line, "NVRM", 4) == 0) {
-//       matchRegex(DRIVER_VERSION_MATCH_PATTERN, line, version);
-//       break;
-//     }
-//   }
-//   fclose(fp);
-// }
+  while ((getline(&line, &len, fp) != -1)) {
+    if (strncmp(line, "NVRM", 4) == 0) {
+      matchRegex(DRIVER_VERSION_MATCH_PATTERN, line, version);
+      break;
+    }
+  }
+  fclose(fp);
+}
 
 void load_necessary_data() {
-  read_controller_configuration();
-  load_single_cuda_function(CUDA_ENTRY_ENUM(cuDriverGetVersion));
+    //read_controller_configuration();
 
-  pthread_once(&g_cuda_set, load_libcuda);
+    read_version_from_proc(driver_version);
+
+    load_single_cuda_function(CUDA_ENTRY_ENUM(cuDriverGetVersion));
+
+    pthread_once(&g_cuda_set, load_libcuda);
 }

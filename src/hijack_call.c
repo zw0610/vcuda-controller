@@ -187,44 +187,46 @@ typedef void (*atomic_fn_ptr)(int, void *);
 
 /** hijack entrypoint */
 CUresult cuDriverGetVersion(int *driverVersion) {
-  CUresult ret;
+    CUresult ret;
 
-//   load_necessary_data();
+    load_necessary_data();
  
 //   pthread_once(&g_init_set, initialization);
 
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuDriverGetVersion, driverVersion);
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuDriverGetVersion, driverVersion);
 //   if (unlikely(ret)) {
 //     // goto DONE;
 //     return ret;
 //   }
 
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuInit(unsigned int flag) {
-  CUresult ret;
+    CUresult ret;
 
-//   load_necessary_data();
+    load_necessary_data();
 
 //   pthread_once(&g_init_set, initialization);
 
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, flag);
+    printf("%s\n", "hijacked cuInit is called!");
+
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, flag);
 //   if (unlikely(ret)) {
 //     // goto DONE;
 //     return ret;
 //   }
 
 // // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
                            unsigned int flags) {
 //   size_t used = 0;
 //   size_t request_size = bytesize;
-  CUresult ret;
+    CUresult ret;
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -234,11 +236,11 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
 //       goto DONE;
 //     }
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
+    printf("%s\n", "hijacked cuMemAllocManaged is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
                         flags);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
@@ -254,7 +256,7 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 //       goto DONE;
 //     }
 //   }
-
+    printf("%s\n", "hijacked cuMemAlloc_v2 is called!");
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
 // DONE:
   return ret;
@@ -263,7 +265,7 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
 //   size_t used = 0;
 //   size_t request_size = bytesize;
-  CUresult ret;
+    CUresult ret;
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -274,9 +276,10 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
 //     }
 //   }
 
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
+    printf("%s\n", "hijacked cuMemAlloc is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
@@ -284,7 +287,7 @@ CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
                             unsigned int ElementSizeBytes) {
 //   size_t used = 0;
 //   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
-  CUresult ret;
+    CUresult ret;
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -294,18 +297,18 @@ CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
 //       goto DONE;
 //     }
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch_v2, dptr, pPitch,
+    printf("%s\n", "hijacked cuMemAllocPitch_v2 is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch_v2, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
                          size_t Height, unsigned int ElementSizeBytes) {
 //   size_t used = 0;
 //   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
-  CUresult ret;
+    CUresult ret;
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -315,11 +318,11 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
 //       goto DONE;
 //     }
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch, dptr, pPitch,
+    printf("%s\n", "hijacked cuMemAllocPitch is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
 // DONE:
-  return ret;
+    return ret;
 }
 
 // static size_t get_array_base_size(int format) {
@@ -372,32 +375,32 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
 
 CUresult cuArrayCreate_v2(CUarray *pHandle,
                           const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
-  CUresult ret;
+    CUresult ret;
 
 //   ret = cuArrayCreate_helper(pAllocateArray);
 //   if (ret != CUDA_SUCCESS) {
 //     goto DONE;
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate_v2, pHandle,
+    printf("%s\n", "hijacked cuArrayCreate_v2 is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate_v2, pHandle,
                         pAllocateArray);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuArrayCreate(CUarray *pHandle,
                        const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
-  CUresult ret;
+    CUresult ret;
 
 //   ret = cuArrayCreate_helper(pAllocateArray);
 //   if (ret != CUDA_SUCCESS) {
 //     goto DONE;
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate, pHandle,
+    printf("%s\n", "hijacked cuArrayCreate is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate, pHandle,
                         pAllocateArray);
 // DONE:
-  return ret;
+    return ret;
 }
 
 // static CUresult cuArray3DCreate_helper(const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
@@ -425,31 +428,32 @@ CUresult cuArrayCreate(CUarray *pHandle,
 
 CUresult cuArray3DCreate_v2(CUarray *pHandle,
                             const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
-  CUresult ret;
+    CUresult ret;
 
 //   ret = cuArray3DCreate_helper(pAllocateArray);
 //   if (ret != CUDA_SUCCESS) {
 //     goto DONE;
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate_v2, pHandle,
+    printf("%s\n", "hijacked cuArray3DCreate_v2 is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate_v2, pHandle,
                         pAllocateArray);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuArray3DCreate(CUarray *pHandle,
                          const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
-  CUresult ret;
+    CUresult ret;
 
 //   ret = cuArray3DCreate_helper(pAllocateArray);
 //   if (ret != CUDA_SUCCESS) {
 //     goto DONE;
 //   }
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate, pHandle,
+    printf("%s\n", "hijacked cuArray3DCreate is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate, pHandle,
                         pAllocateArray);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuMipmappedArrayCreate(
@@ -459,7 +463,7 @@ CUresult cuMipmappedArrayCreate(
 //   size_t used = 0;
 //   size_t base_size = 0;
 //   size_t request_size = 0;
-  CUresult ret;
+    CUresult ret;
 
 //   if (g_vcuda_config.enable) {
 //     base_size = get_array_base_size(pMipmappedArrayDesc->Format);
@@ -474,11 +478,11 @@ CUresult cuMipmappedArrayCreate(
 //       goto DONE;
 //     }
 //   }
-
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
+    printf("%s\n", "hijacked cuMipmappedArrayCreate is called!");
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
                         pMipmappedArrayDesc, numMipmapLevels);
 // DONE:
-  return ret;
+    return ret;
 }
 
 CUresult cuDeviceTotalMem_v2(size_t *bytes, CUdevice dev) {
@@ -487,8 +491,8 @@ CUresult cuDeviceTotalMem_v2(size_t *bytes, CUdevice dev) {
 
 //     return CUDA_SUCCESS;
 //   }
-
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem_v2, bytes, dev);
+    printf("%s\n", "hijacked cuDeviceTotalMem_v2 is called!");
+    return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem_v2, bytes, dev);
 }
 
 CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
@@ -497,8 +501,8 @@ CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
 
 //     return CUDA_SUCCESS;
 //   }
-
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem, bytes, dev);
+    printf("%s\n", "hijacked cuDeviceTotalMem is called!");
+    return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem, bytes, dev);
 }
 
 CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
@@ -513,7 +517,7 @@ CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
 
 //     return CUDA_SUCCESS;
 //   }
-
+    printf("%s\n", "hijacked cuMemGetInfo_v2 is called!");
     return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo_v2, free, total);
 }
 
@@ -529,7 +533,7 @@ CUresult cuMemGetInfo(size_t *free, size_t *total) {
 
 //     return CUDA_SUCCESS;
 //   }
-
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo, free, total);
+    printf("%s\n", "hijacked cuMemGetInfo is called!");
+    return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo, free, total);
 }
 
