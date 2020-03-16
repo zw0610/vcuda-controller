@@ -32,103 +32,94 @@ extern char pid_path[];
 
 typedef void (*atomic_fn_ptr)(int, void *);
 
-static pthread_once_t g_init_set = PTHREAD_ONCE_INIT;
-static pthread_once_t g_register_set = PTHREAD_ONCE_INIT;
+// static pthread_once_t g_init_set = PTHREAD_ONCE_INIT;
+// static pthread_once_t g_register_set = PTHREAD_ONCE_INIT;
 
-static uint32_t g_block_locker = 0;
+// static uint32_t g_block_locker = 0;
 
-static const struct timespec g_cycle = {
-    .tv_sec = 0,
-    .tv_nsec = TIME_TICK * MILLISEC,
-};
+// static const struct timespec g_cycle = {
+//     .tv_sec = 0,
+//     .tv_nsec = TIME_TICK * MILLISEC,
+// };
 
-static const struct timespec g_wait = {
-    .tv_sec = 0,
-    .tv_nsec = 120 * MILLISEC,
-};
+// static const struct timespec g_wait = {
+//     .tv_sec = 0,
+//     .tv_nsec = 120 * MILLISEC,
+// };
 
 /** pid mapping related */
-static int g_pids_table[MAX_PIDS];
-static int g_pids_table_size;
+// static int g_pids_table[MAX_PIDS];
+// static int g_pids_table_size;
 
 /** internal function definition */
-static void register_to_remote();
 
-static void atomic_action(const char *, atomic_fn_ptr, void *);
+// static void get_used_gpu_memory(int, void *);
 
-static void load_pids_table(int, void *);
+// static void initialization();
 
-static void get_used_gpu_memory(int, void *);
+// static const char *cuda_error(CUresult, const char **);
 
-static void get_used_gpu_utilization(int, void *);
+// static int int_match(const void *, const void *);
 
-static void initialization();
+// /** helper function */
+// int int_match(const void *a, const void *b) {
+//   const int *ra = (const int *) a;
+//   const int *rb = (const int *) b;
 
-static void change_token(int);
-
-static const char *cuda_error(CUresult, const char **);
-
-static int int_match(const void *, const void *);
-
-/** helper function */
-int int_match(const void *a, const void *b) {
-  const int *ra = (const int *) a;
-  const int *rb = (const int *) b;
-
-  if (*ra < *rb) {
-    return -1;
-  }
-
-  if (*ra > *rb) {
-    return 1;
-  }
-
-  return 0;
-}
-
-static void atomic_action(const char *filename, atomic_fn_ptr fn_ptr,
-                          void *arg) {
-  int fd;
-
-  fd = open(filename, O_RDONLY);
-  if (unlikely(fd == -1)) {
-    LOGGER(FATAL, "can't open %s, error %s", filename, strerror(errno));
-  }
-
-  fn_ptr(fd, arg);
-
-  close(fd);
-}
-
-const char *cuda_error(CUresult code, const char **p) {
-  CUDA_ENTRY_CALL(cuda_library_entry, cuGetErrorString, code, p);
-
-  return *p;
-}
-
-static void load_pids_table(int fd, void *arg UNUSED) {
-  int item = 0;
-  int rsize = 0;
-  int i = 0;
-
-//   for (item = 0; item < MAX_PIDS; item++) {
-//     rsize = (int) read(fd, g_pids_table + item, sizeof(int));
-//     if (unlikely(rsize != sizeof(int))) {
-//       break;
-//     }
+//   if (*ra < *rb) {
+//     return -1;
 //   }
 
-//   for (i = 0; i < item; i++) {
-//     LOGGER(8, "pid: %d", g_pids_table[i]);
+//   if (*ra > *rb) {
+//     return 1;
 //   }
 
-//   g_pids_table_size = item;
+//   return 0;
+// }
 
-//   LOGGER(8, "read %d items from %s", g_pids_table_size, pid_path);
-}
+// static void atomic_action(const char *filename, atomic_fn_ptr fn_ptr,
+//                           void *arg) {
+//   int fd;
 
-static void get_used_gpu_memory(int fd, void *arg) {
-  size_t *used_memory = arg;
+//   fd = open(filename, O_RDONLY);
+//   if (unlikely(fd == -1)) {
+//     LOGGER(FATAL, "can't open %s, error %s", filename, strerror(errno));
+//   }
+
+//   fn_ptr(fd, arg);
+
+//   close(fd);
+// }
+
+// const char *cuda_error(CUresult code, const char **p) {
+//   CUDA_ENTRY_CALL(cuda_library_entry, cuGetErrorString, code, p);
+
+//   return *p;
+// }
+
+// static void load_pids_table(int fd, void *arg UNUSED) {
+// //   int item = 0;
+// //   int rsize = 0;
+// //   int i = 0;
+
+// //   for (item = 0; item < MAX_PIDS; item++) {
+// //     rsize = (int) read(fd, g_pids_table + item, sizeof(int));
+// //     if (unlikely(rsize != sizeof(int))) {
+// //       break;
+// //     }
+// //   }
+
+// //   for (i = 0; i < item; i++) {
+// //     LOGGER(8, "pid: %d", g_pids_table[i]);
+// //   }
+
+// //   g_pids_table_size = item;
+
+// //   LOGGER(8, "read %d items from %s", g_pids_table_size, pid_path);
+// }
+
+// static void get_used_gpu_memory(int fd, void *arg) {
+//   size_t *used_memory = arg;
 
 //   nvmlDevice_t dev;
 //   nvmlProcessInfo_t pids_on_device[MAX_PIDS];
@@ -180,57 +171,59 @@ static void get_used_gpu_memory(int fd, void *arg) {
 
 // DONE:
 //   NVML_ENTRY_CALL(nvml_library_entry, nvmlShutdown);
-}
+// }
 
-static void initialization() {
-  int ret;
-  const char *cuda_err_string = NULL;
+// static void initialization() {
+//   int ret;
+//   const char *cuda_err_string = NULL;
 
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, 0);
-  if (unlikely(ret)) {
-    LOGGER(FATAL, "cuInit error %s",
-           cuda_error((CUresult) ret, &cuda_err_string));
-  }
+//   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, 0);
+//   if (unlikely(ret)) {
+//     LOGGER(FATAL, "cuInit error %s",
+//            cuda_error((CUresult) ret, &cuda_err_string));
+//   }
 
-}
+// }
 
 /** hijack entrypoint */
 CUresult cuDriverGetVersion(int *driverVersion) {
   CUresult ret;
 
-  load_necessary_data();
+//   load_necessary_data();
  
-  pthread_once(&g_init_set, initialization);
+//   pthread_once(&g_init_set, initialization);
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuDriverGetVersion, driverVersion);
-  if (unlikely(ret)) {
-    goto DONE;
-  }
+//   if (unlikely(ret)) {
+//     // goto DONE;
+//     return ret;
+//   }
 
-DONE:
+// DONE:
   return ret;
 }
 
 CUresult cuInit(unsigned int flag) {
   CUresult ret;
 
-  load_necessary_data();
+//   load_necessary_data();
 
-  pthread_once(&g_init_set, initialization);
+//   pthread_once(&g_init_set, initialization);
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, flag);
-  if (unlikely(ret)) {
-    goto DONE;
-  }
+//   if (unlikely(ret)) {
+//     // goto DONE;
+//     return ret;
+//   }
 
-DONE:
+// // DONE:
   return ret;
 }
 
 CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
                            unsigned int flags) {
-  size_t used = 0;
-  size_t request_size = bytesize;
+//   size_t used = 0;
+//   size_t request_size = bytesize;
   CUresult ret;
 
 //   if (g_vcuda_config.enable) {
@@ -244,13 +237,13 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
                         flags);
-DONE:
+// DONE:
   return ret;
 }
 
 CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
-  size_t used = 0;
-  size_t request_size = bytesize;
+//   size_t used = 0;
+//   size_t request_size = bytesize;
   CUresult ret;
 
 //   if (g_vcuda_config.enable) {
@@ -263,13 +256,13 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 //   }
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
-DONE:
+// DONE:
   return ret;
 }
 
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
-  size_t used = 0;
-  size_t request_size = bytesize;
+//   size_t used = 0;
+//   size_t request_size = bytesize;
   CUresult ret;
 
 //   if (g_vcuda_config.enable) {
@@ -282,15 +275,15 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
 //   }
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
-DONE:
+// DONE:
   return ret;
 }
 
 CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
                             size_t WidthInBytes, size_t Height,
                             unsigned int ElementSizeBytes) {
-  size_t used = 0;
-  size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
+//   size_t used = 0;
+//   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
   CUresult ret;
 
 //   if (g_vcuda_config.enable) {
@@ -304,14 +297,14 @@ CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch_v2, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
-DONE:
+// DONE:
   return ret;
 }
 
 CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
                          size_t Height, unsigned int ElementSizeBytes) {
-  size_t used = 0;
-  size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
+//   size_t used = 0;
+//   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
   CUresult ret;
 
 //   if (g_vcuda_config.enable) {
@@ -325,57 +318,57 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
-DONE:
+// DONE:
   return ret;
 }
 
-static size_t get_array_base_size(int format) {
-  size_t base_size = 0;
+// static size_t get_array_base_size(int format) {
+//   size_t base_size = 0;
 
-  switch (format) {
-    case CU_AD_FORMAT_UNSIGNED_INT8:
-    case CU_AD_FORMAT_SIGNED_INT8:
-      base_size = 8;
-      break;
-    case CU_AD_FORMAT_UNSIGNED_INT16:
-    case CU_AD_FORMAT_SIGNED_INT16:
-    case CU_AD_FORMAT_HALF:
-      base_size = 16;
-      break;
-    case CU_AD_FORMAT_UNSIGNED_INT32:
-    case CU_AD_FORMAT_SIGNED_INT32:
-    case CU_AD_FORMAT_FLOAT:
-      base_size = 32;
-      break;
-    default:
-      base_size = 32;
-  }
+//   switch (format) {
+//     case CU_AD_FORMAT_UNSIGNED_INT8:
+//     case CU_AD_FORMAT_SIGNED_INT8:
+//       base_size = 8;
+//       break;
+//     case CU_AD_FORMAT_UNSIGNED_INT16:
+//     case CU_AD_FORMAT_SIGNED_INT16:
+//     case CU_AD_FORMAT_HALF:
+//       base_size = 16;
+//       break;
+//     case CU_AD_FORMAT_UNSIGNED_INT32:
+//     case CU_AD_FORMAT_SIGNED_INT32:
+//     case CU_AD_FORMAT_FLOAT:
+//       base_size = 32;
+//       break;
+//     default:
+//       base_size = 32;
+//   }
 
-  return base_size;
-}
+//   return base_size;
+// }
 
-static CUresult cuArrayCreate_helper(const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
-    size_t used = 0;
-    size_t base_size = 0;
-    size_t request_size = 0;
-    CUresult ret = CUDA_SUCCESS;
-
-
-    base_size = get_array_base_size(pAllocateArray->Format);
-    request_size = base_size * pAllocateArray->NumChannels *
-                   pAllocateArray->Height * pAllocateArray->Width;
-
-    // atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-    // if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-    //     ret = CUDA_ERROR_OUT_OF_MEMORY;
-    //     goto DONE;
-    // }
+// static CUresult cuArrayCreate_helper(const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
+//     // size_t used = 0;
+//     // size_t base_size = 0;
+//     // size_t request_size = 0;
+//     CUresult ret = CUDA_SUCCESS;
 
 
-// DONE:
-    return ret;
-}
+//     // base_size = get_array_base_size(pAllocateArray->Format);
+//     // request_size = base_size * pAllocateArray->NumChannels *
+//     //                pAllocateArray->Height * pAllocateArray->Width;
+
+//     // atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
+
+//     // if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
+//     //     ret = CUDA_ERROR_OUT_OF_MEMORY;
+//     //     goto DONE;
+//     // }
+
+
+// // DONE:
+//     return ret;
+// }
 
 CUresult cuArrayCreate_v2(CUarray *pHandle,
                           const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
@@ -388,7 +381,7 @@ CUresult cuArrayCreate_v2(CUarray *pHandle,
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate_v2, pHandle,
                         pAllocateArray);
-DONE:
+// DONE:
   return ret;
 }
 
@@ -403,32 +396,32 @@ CUresult cuArrayCreate(CUarray *pHandle,
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate, pHandle,
                         pAllocateArray);
-DONE:
-  return ret;
-}
-
-static CUresult cuArray3DCreate_helper(const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
-  size_t used = 0;
-  size_t base_size = 0;
-  size_t request_size = 0;
-  CUresult ret = CUDA_SUCCESS;
-
-//   if (g_vcuda_config.enable) {
-//     base_size = get_array_base_size(pAllocateArray->Format);
-//     request_size = base_size * pAllocateArray->NumChannels *
-//                    pAllocateArray->Height * pAllocateArray->Width;
-
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
-
 // DONE:
   return ret;
 }
+
+// static CUresult cuArray3DCreate_helper(const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
+// //   size_t used = 0;
+// //   size_t base_size = 0;
+// //   size_t request_size = 0;
+//   CUresult ret = CUDA_SUCCESS;
+
+// //   if (g_vcuda_config.enable) {
+// //     base_size = get_array_base_size(pAllocateArray->Format);
+// //     request_size = base_size * pAllocateArray->NumChannels *
+// //                    pAllocateArray->Height * pAllocateArray->Width;
+
+// //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
+
+// //     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
+// //       ret = CUDA_ERROR_OUT_OF_MEMORY;
+// //       goto DONE;
+// //     }
+// //   }
+
+// // DONE:
+//   return ret;
+// }
 
 CUresult cuArray3DCreate_v2(CUarray *pHandle,
                             const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
@@ -441,7 +434,7 @@ CUresult cuArray3DCreate_v2(CUarray *pHandle,
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate_v2, pHandle,
                         pAllocateArray);
-DONE:
+// DONE:
   return ret;
 }
 
@@ -455,7 +448,7 @@ CUresult cuArray3DCreate(CUarray *pHandle,
 //   }
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate, pHandle,
                         pAllocateArray);
-DONE:
+// DONE:
   return ret;
 }
 
@@ -463,9 +456,9 @@ CUresult cuMipmappedArrayCreate(
     CUmipmappedArray *pHandle,
     const CUDA_ARRAY3D_DESCRIPTOR *pMipmappedArrayDesc,
     unsigned int numMipmapLevels) {
-  size_t used = 0;
-  size_t base_size = 0;
-  size_t request_size = 0;
+//   size_t used = 0;
+//   size_t base_size = 0;
+//   size_t request_size = 0;
   CUresult ret;
 
 //   if (g_vcuda_config.enable) {
@@ -484,7 +477,7 @@ CUresult cuMipmappedArrayCreate(
 
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
                         pMipmappedArrayDesc, numMipmapLevels);
-DONE:
+// DONE:
   return ret;
 }
 
@@ -509,7 +502,7 @@ CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
 }
 
 CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
-    size_t used = 0;
+    // size_t used = 0;
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -525,7 +518,7 @@ CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
 }
 
 CUresult cuMemGetInfo(size_t *free, size_t *total) {
-  size_t used = 0;
+//   size_t used = 0;
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
