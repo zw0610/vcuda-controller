@@ -108,6 +108,12 @@ bool RNM::init_gmem(const std::size_t bytes) {
 void RNM::set_process(const int npid) {
     pid = npid;
     // read stime from /proc/{pid}/stat, the 22nd element
+    if (pid <= 0)
+    {
+        stime = 0;
+        return;
+    }
+    
     const std::string filename = "stat";
     const std::string proc_dir = "/proc/" + std::to_string(pid) + "/";
 
