@@ -50,7 +50,8 @@ struct RNode
         this->res_entry_idx = nres_entry_idx;
         this->stat = RNodeStatus::EXIST;
     }
-    
+        
+    // copy operator
     RNode &operator=(const RNode &rn)
     {
         this->pid = rn.pid;
@@ -59,9 +60,7 @@ struct RNode
         this->stat = rn.stat;
         return *this;
     }
-    
-    // need a copy operator here;
-    
+        
     void initialize(void)
     {
         pid = -1;

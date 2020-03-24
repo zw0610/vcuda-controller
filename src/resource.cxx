@@ -152,7 +152,6 @@ RNode *RNM::insert_rnode(const pid_st &key, const RNode &val)
         std::size_t pos = hash(key, i);
         if (ptr_rnode[pos].get_stat() == RNodeStatus::NONEXIST || ptr_rnode[pos].get_stat() == RNodeStatus::DELETED)
         {
-            //std::cout << "inserting at " << pos << " with value: " << val << std::endl;
             ptr_rnode[pos] = val;
             return &ptr_rnode[pos];
         }
@@ -182,7 +181,6 @@ RNode *RNM::find_rnode(const pid_st &key) const
         {
             if (ptr_rnode[pos].same_key(key))
             {
-                //std::cout << "found rnode: " << ptr_rnode[pos] << std::endl;
                 return ptr_rnode + pos;
             }
             // if the rnode exist, but not match, check the next
@@ -245,10 +243,8 @@ void RNM::print_gmem(void) const {
 const int RNM::push_gmem(const GMem &gm){
     for (int i = 0; i < len_gmem; i++)
     {
-        //std::cout << "checking resource record: " << i << std::endl;
         if (ptr_gmem[i].empty())
         {
-//            std::cout << "found empty slot at " << i << std::endl;
             ptr_gmem[i].set_res(gm.ptr, gm.bytes);
             ptr_gmem[i].set_next(-1);
             return i;
@@ -294,39 +290,33 @@ void RNM::add_gmem(CUdeviceptr dptr, const std::size_t bytes) {
     const GMem gm = GMem(dptr, bytes);
     
     // check if the rnode exist
-    //std::cout << "finding rnode" << std::endl;
     RNode* target_rn = find_rnode(key);
 
     if (target_rn != nullptr)
     {
         // push the record to shared memory
-        //std::cout << "pushing gmem record" << std::endl;
         int g_idx = find_gmem(target_rn, dptr);
         if (g_idx == -1) {
             g_idx = push_gmem(gm);
         }
 
         // if the process already exists
-        //std::cout << "found rnode, adding gmem record" << std::endl;
         link_rnode_gmem(target_rn, g_idx);
     }
     else
     {
         // if the node does not exist
         // create node first
-        //std::cout << "rnode not found, adding rnode first" << std::endl;
         RNode val_rn = RNode(pid, stime, -1);
         RNode* rn = insert_rnode(key, val_rn);
         
         // push the record to shared memory
-        //std::cout << "pushing gmem record" << std::endl;
         int g_idx = find_gmem(rn, dptr);
         if (g_idx == -1) {
             g_idx = push_gmem(gm);
         }
 
         // then insert resource
-        //std::cout << "adding gmem record after node inserted" << std::endl;
         link_rnode_gmem(rn, g_idx);
         }
 }
