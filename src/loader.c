@@ -29,6 +29,7 @@
 
 #include "include/cuda-helper.h"
 #include "include/hijack.h"
+#include "include/resource_c_wrapper.hpp"
 
 entry_t cuda_library_entry[] = {
     {.name = "cuInit"},
@@ -589,6 +590,8 @@ static void read_version_from_proc(char *version) {
 
 void load_necessary_data() {
     //read_controller_configuration();
+
+    print_rnodes();
 
     read_version_from_proc(driver_version);
 
