@@ -1,8 +1,12 @@
 #include "include/resource.hpp"
 
 #include <errno.h>
-#include <string.h>
 #include <assert.h>
+
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
 
 std::ostream &operator<<(std::ostream &os, const RNode &rn)
 {
@@ -103,7 +107,27 @@ bool RNM::init_gmem(const std::size_t bytes) {
 
 void RNM::set_process(const int npid) {
     pid = npid;
-    stime = 0;
+    // read stime from /proc/{pid}/stat, the 22nd element
+    const std::string filename = "stat";
+    const std::string proc_dir = "/proc/" + std::to_string(pid) + "/";
+
+    std::ifstream stat_file{ proc_dir + filename };
+    std::string stime_placeholder;
+
+    if (stat_file.is_open())
+    {
+        std::stringstream str_stream;
+        str_stream << stat_file.rdbuf();
+
+        for (int i = 0; i < 22; i++) {
+            str_stream >> stime_placeholder;
+        }
+        stime = atol(stime_placeholder.c_str());
+    }
+    else
+    {
+        std::cout << "cannot open " << proc_dir << filename << std::endl;
+    }
 }
 
 const std::size_t RNM::pre_hash(const pid_st &key) const
