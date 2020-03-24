@@ -13,10 +13,11 @@
 extern "C" {
 #endif
 
-    void RNM_init(const int, const int);
+    void RNM_init(const int, const int, const int);
     void print_rnodes(void);
     void print_gmem(void);
-    void add_gmem(const int, const long, unsigned long long, const unsigned int);
+    void add_gmem(unsigned long long, const unsigned int);
+    void set_process(const int);
 
 #ifdef __cplusplus
 }

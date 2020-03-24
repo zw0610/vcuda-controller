@@ -19,6 +19,7 @@ std::ostream &operator<<(std::ostream &os, const GMem &gm) {
 
 RNM::RNM()
 {   
+    set_process(-1);
     len_rnode = 101;
     len_gmem = 1024;
     init();
@@ -26,6 +27,8 @@ RNM::RNM()
 
 RNM::RNM(const RNM &rnm)
 {
+    set_process(rnm.pid);
+
     // RNode related copy constructor
     key_rnode = rnm.key_rnode;
     shm_id_rnode = rnm.shm_id_rnode;
@@ -40,7 +43,8 @@ RNM::RNM(const RNM &rnm)
     len_gmem = rnm.len_gmem;
 }
 
-RNM::RNM(const int clen_rnode, const int clen_gmem) {
+RNM::RNM(const int npid, const int clen_rnode, const int clen_gmem) {
+    set_process(npid);
     this->len_rnode = clen_rnode;
     this->len_gmem = clen_gmem;
     init();
@@ -95,6 +99,11 @@ bool RNM::init_gmem(const std::size_t bytes) {
         return true;
     }
     return false;
+}
+
+void RNM::set_process(const int npid) {
+    pid = npid;
+    stime = 0;
 }
 
 const std::size_t RNM::pre_hash(const pid_st &key) const
@@ -174,7 +183,7 @@ bool RNM::contain(const pid_st &key) const {
 
 void RNM::print_rnodes(void) const
 {
-    std::cout << "Listing items from Resource Node Map:" << std::endl;
+    std::cout << "Listing items from Resource Node Map from Process "<< pid << " Starting since " << stime << " :" << std::endl;
     std::size_t count = 0;
     for (int i = 0; i < len_rnode; i++)
     {
@@ -192,7 +201,7 @@ void RNM::print_rnodes(void) const
 }
 
 void RNM::print_gmem(void) const {
-    std::cout << "Listing items from GPU Memory:" << std::endl;
+    std::cout << "Listing items from GPU Memory from Process "<< pid << " Starting since " << stime << " :" << std::endl;
     std::size_t count = 0;
     for (int i = 0; i < len_gmem; i++)
     {
@@ -255,7 +264,7 @@ const int RNM::find_gmem(const RNode * rn, const CUdeviceptr dptr) const {
     return -1;
 }
 
-void RNM::add_gmem(const int32_t pid, const uint64_t stime, CUdeviceptr dptr, const std::size_t bytes) {
+void RNM::add_gmem(CUdeviceptr dptr, const std::size_t bytes) {
     // prepare data
     const pid_st key = std::make_tuple(pid, stime);
     const GMem gm = GMem(dptr, bytes);
@@ -313,7 +322,7 @@ void RNM::remove_gmem_by_dptr(const int prev_idx, const int g_idx, CUdeviceptr d
     remove_gmem_by_dptr(g_idx, ptr_gmem[g_idx].next, dptr);
 }
 
-void RNM::remove_gmem(const int32_t pid, const uint64_t stime, CUdeviceptr dptr) {
+void RNM::remove_gmem(CUdeviceptr dptr) {
     const pid_st key = std::make_tuple(pid, stime);
     RNode* target_rn = find_rnode(key);
 

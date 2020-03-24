@@ -12,6 +12,9 @@
 
 class RNM
 {
+    int pid;
+    unsigned long stime;
+
     key_t key_rnode;
     int shm_id_rnode;
     RNode* ptr_rnode;
@@ -47,11 +50,13 @@ private:
 public:
     RNM();
 
-    RNM(const int, const int);
+    RNM(const int, const int, const int);
 
     RNM(const RNM &);
 
     ~RNM();
+
+    void set_process(const int);
     
     RNode *insert_rnode(const pid_st &, const RNode &);
     
@@ -65,7 +70,7 @@ public:
     
     void print_gmem(void) const;
 
-    void add_gmem(const int32_t, const uint64_t, CUdeviceptr, const std::size_t);
+    void add_gmem(CUdeviceptr, const std::size_t);
     
-    void remove_gmem(const int32_t, const uint64_t, CUdeviceptr);
+    void remove_gmem(CUdeviceptr);
 };

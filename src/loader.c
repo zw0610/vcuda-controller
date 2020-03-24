@@ -590,6 +590,9 @@ static void read_version_from_proc(char *version) {
 
 void load_necessary_data() {
     //read_controller_configuration();
+    pid_t my_pid = getpid();
+
+    set_process(my_pid);
 
     print_rnodes();
 

@@ -11,8 +11,8 @@
 
 static RNM rnm;
 
-extern "C" void RNM_init(const int len_rnode, const int len_gmem) {
-    rnm = RNM(len_rnode, len_gmem);
+extern "C" void RNM_init(const int pid, const int len_rnode, const int len_gmem) {
+    rnm = RNM(pid, len_rnode, len_gmem);
 }
 
 extern "C" void print_rnodes(void) {
@@ -23,6 +23,10 @@ extern "C" void print_gmem(void) {
     rnm.print_gmem();
 }
 
-extern "C" void add_gmem(const int pid, const long stime, unsigned long long dptr, const unsigned int bytes) {
-    rnm.add_gmem(pid, stime, dptr, bytes);
+extern "C" void add_gmem(unsigned long long dptr, const unsigned int bytes) {
+    rnm.add_gmem(dptr, bytes);
+}
+
+extern "C" void set_process(const int pid) {
+    rnm.set_process(pid);
 }
