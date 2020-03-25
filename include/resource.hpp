@@ -73,4 +73,6 @@ public:
     void add_gmem(CUdeviceptr, const std::size_t);
     
     void remove_gmem(CUdeviceptr);
+
+    std::size_t gmem_used(void); 
 };
