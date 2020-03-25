@@ -235,19 +235,10 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
     {
         return CUDA_ERROR_OUT_OF_MEMORY;
     }
-
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
     
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
                         flags);
-// DONE:
+
     if (ret == CUDA_SUCCESS)
     {
         add_gmem(*dptr, bytesize);
@@ -267,18 +258,8 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
         return CUDA_ERROR_OUT_OF_MEMORY;
     }
     
-
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
-    
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
-// DONE:
+
     if (ret == CUDA_SUCCESS)
     {
         add_gmem(*dptr, bytesize);
@@ -291,22 +272,23 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 }
 
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
-//    size_t used = 0;
-//    size_t request_size = bytesize;
+    printf("%s\n", "hijacked cuMemAlloc is called!");
+
+    const size_t used = get_gmem_used();
+    const size_t request_size = bytesize;
     CUresult ret;
 
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
+    if ((used + request_size) > get_shared_GPU_mem_limit())
+    {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
 
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
-
-    printf("%s\n", "hijacked cuMemAlloc is called!");
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem(*dptr, bytesize);
+    }
     return ret;
 }
 
@@ -542,17 +524,6 @@ CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
 }
 
 CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
-    // size_t used = 0;
-
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-//     *total = g_vcuda_config.gpu_memory;
-//     *free =
-//         used > g_vcuda_config.gpu_memory ? 0 : g_vcuda_config.gpu_memory - used;
-
-//     return CUDA_SUCCESS;
-//   }
     printf("%s\n", "hijacked cuMemGetInfo_v2 is called!");
     const size_t used = get_gmem_used();
 
@@ -562,7 +533,6 @@ CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
     *free = used > *total ? 0 : *total - used;
 
     return CUDA_SUCCESS;
-    // return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo_v2, free, total);
 }
 
 CUresult cuMemGetInfo(size_t *free, size_t *total) {
@@ -575,17 +545,5 @@ CUresult cuMemGetInfo(size_t *free, size_t *total) {
     *free = used > *total ? 0 : *total - used;
 
     return CUDA_SUCCESS;
-
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-//     *total = g_vcuda_config.gpu_memory;
-//     *free =
-//         used > g_vcuda_config.gpu_memory ? 0 : g_vcuda_config.gpu_memory - used;
-
-//     return CUDA_SUCCESS;
-//   }
-    
-    //return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo, free, total);
 }
 
