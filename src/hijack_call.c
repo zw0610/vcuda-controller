@@ -225,9 +225,16 @@ CUresult cuInit(unsigned int flag) {
 
 CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
                            unsigned int flags) {
-//   size_t used = 0;
-//   size_t request_size = bytesize;
+    printf("%s\n", "hijacked cuMemAllocManaged is called!");
+
+    const size_t used = get_gmem_used();
+    const size_t request_size = bytesize;
     CUresult ret;
+
+    if ((used + request_size) > get_shared_GPU_mem_limit())
+    {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -237,17 +244,29 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
 //       goto DONE;
 //     }
 //   }
-    printf("%s\n", "hijacked cuMemAllocManaged is called!");
+    
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
                         flags);
 // DONE:
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem(*dptr, bytesize);
+    }
     return ret;
 }
 
 CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
-//   size_t used = 0;
-//   size_t request_size = bytesize;
-  CUresult ret;
+    printf("%s\n", "hijacked cuMemAlloc_v2 is called!");
+
+    const size_t used = get_gmem_used();
+    const size_t request_size = bytesize;
+    CUresult ret;
+
+    if ((used + request_size) > get_shared_GPU_mem_limit())
+    {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+    
 
 //   if (g_vcuda_config.enable) {
 //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
@@ -257,10 +276,18 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 //       goto DONE;
 //     }
 //   }
-    printf("%s\n", "hijacked cuMemAlloc_v2 is called!");
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
+    
+    ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
 // DONE:
-  return ret;
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem(*dptr, bytesize);
+    }
+    
+    // print_rnodes();
+    // print_gmem();
+    // printf("now, used GPU memory = %lu\n", get_gmem_used());
+    return ret;
 }
 
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {

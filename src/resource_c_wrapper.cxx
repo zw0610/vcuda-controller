@@ -9,8 +9,8 @@
 #include "include/resource_c_wrapper.hpp"
 #include "include/resource.hpp"
 
-#include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
 
 static RNM rnm;
 
@@ -23,7 +23,7 @@ extern "C" void print_rnodes(void) { rnm.print_rnodes(); }
 
 extern "C" void print_gmem(void) { rnm.print_gmem(); }
 
-extern "C" void add_gmem(unsigned long long dptr, const unsigned int bytes) {
+extern "C" void add_gmem(unsigned long long dptr, const size_t bytes) {
     rnm.add_gmem(dptr, bytes);
 }
 
@@ -38,4 +38,4 @@ extern "C" size_t get_shared_GPU_mem_limit(void) {
     return gml;
 }
 
-extern "C" size_t get_gmem_used(void) { return 0; }
+extern "C" size_t get_gmem_used(void) { return rnm.gmem_used(); }
