@@ -252,10 +252,11 @@ void RNM::link_rnode_gmem(RNode *rn, const int gmem_idx) {
     }
 }
 
-const int RNM::find_gmem(const RNode *rn, const CUdeviceptr dptr) const {
+template <typename T>
+const int RNM::find_gmem(const RNode *rn, const T dptr) const {
     int g_idx = rn->res_entry_idx;
     while (!ptr_gmem[g_idx].empty()) {
-        if (ptr_gmem[g_idx].ptr == dptr) {
+        if (*static_cast<T*>(ptr_gmem[g_idx].ptr) == dptr) {
             return g_idx;
         }
         g_idx = ptr_gmem[g_idx].next;
@@ -263,7 +264,8 @@ const int RNM::find_gmem(const RNode *rn, const CUdeviceptr dptr) const {
     return -1;
 }
 
-void RNM::add_gmem(CUdeviceptr dptr, const std::size_t bytes) {
+template<typename T>
+void RNM::add_gmem(void* dptr, const std::size_t bytes) {
     // prepare data
     const pid_st key = std::make_tuple(pid, stime);
     const GMem gm = GMem(dptr, bytes);
@@ -273,11 +275,14 @@ void RNM::add_gmem(CUdeviceptr dptr, const std::size_t bytes) {
 
     if (target_rn != nullptr) {
         // push the record to shared memory
-        int g_idx = find_gmem(target_rn, dptr);
+        int g_idx = find_gmem(target_rn, *static_cast<T*>(dptr));
         if (g_idx == -1) {
             g_idx = push_gmem(gm);
+        } else {
+            // mark: do we need to change the bytes registered?
+            // which should not accur. 
+            ptr_gmem[g_idx].set_res(dptr, bytes);
         }
-
         // if the process already exists
         link_rnode_gmem(target_rn, g_idx);
     } else {
@@ -287,9 +292,13 @@ void RNM::add_gmem(CUdeviceptr dptr, const std::size_t bytes) {
         RNode *rn = insert_rnode(key, val_rn);
 
         // push the record to shared memory
-        int g_idx = find_gmem(rn, dptr);
+        int g_idx = find_gmem(rn, *static_cast<T*>(dptr));
         if (g_idx == -1) {
             g_idx = push_gmem(gm);
+        } else {
+            // mark: do we need to change the bytes registered?
+            // which should not accur. 
+            ptr_gmem[g_idx].set_res(dptr, bytes);
         }
 
         // then insert resource
@@ -302,7 +311,8 @@ void RNM::remove_gmem_by_dptr(const int prev_idx, const int g_idx,
     if (ptr_gmem[g_idx].empty()) {
         return;
     }
-    if (ptr_gmem[g_idx].ptr == dptr) {
+    void* tmp_ptr = ptr_gmem[g_idx].ptr;
+    if (*static_cast<CUdeviceptr*>(tmp_ptr) == dptr) {
         if (prev_idx == -1) {
             ptr_gmem[g_idx].shallow_delete();
         } else {
@@ -345,3 +355,6 @@ std::size_t RNM::gmem_used(void) {
 
     return used;
 }
+
+template void RNM::add_gmem<CUdeviceptr>(void*, const std::size_t);
+template const int RNM::find_gmem<CUdeviceptr>(const RNode*, const CUdeviceptr) const;

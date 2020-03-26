@@ -37,7 +37,8 @@ private:
 
     const std::size_t hash(const pid_st &, const int ) const;
     
-    const int find_gmem(const RNode*, const CUdeviceptr)const ;
+    template<typename T>
+    const int find_gmem(const RNode*, const T) const;
 
     const int push_gmem(const GMem&);
     
@@ -70,7 +71,8 @@ public:
     
     void print_gmem(void) const;
 
-    void add_gmem(CUdeviceptr, const std::size_t);
+    template<typename T>
+    void add_gmem(void*, const std::size_t);
     
     void remove_gmem(CUdeviceptr);
 

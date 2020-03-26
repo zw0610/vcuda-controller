@@ -10,11 +10,11 @@
 #ifndef gmem_h
 #define gmem_h
 
-typedef unsigned int CUdeviceptr;
+typedef unsigned long long CUdeviceptr;
 
 struct GMem
 {
-    CUdeviceptr ptr;
+    void* ptr;
     std::size_t bytes;
     int next;
     
@@ -23,7 +23,7 @@ struct GMem
         initialize();
     }
     
-    GMem(CUdeviceptr new_ptr, const std::size_t new_bytes) {
+    GMem(void* new_ptr, const std::size_t new_bytes) {
         set_res(new_ptr, new_bytes);
         set_next(-1);
     }
@@ -40,7 +40,7 @@ struct GMem
         next = idx;
     }
     
-    void set_res(CUdeviceptr new_ptr, const std::size_t new_bytes)
+    void set_res(void* new_ptr, const std::size_t new_bytes)
     {
         ptr = new_ptr;
         bytes = new_bytes;

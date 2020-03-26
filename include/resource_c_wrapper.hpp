@@ -7,6 +7,7 @@
 //
 
 #include <stdlib.h>
+#include <include/cuda-subset.h>
 
 #ifndef resource_c_wrapper_hpp
 #define resource_c_wrapper_hpp
@@ -18,7 +19,7 @@ extern "C" {
     void RNM_init(const int, const int, const int);
     void print_rnodes(void);
     void print_gmem(void);
-    void add_gmem(unsigned long long, const size_t);
+    void add_gmem(CUdeviceptr*, const size_t);
     void free_gmem(unsigned long long);
     void set_process(const int);
 

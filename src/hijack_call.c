@@ -242,7 +242,7 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
 
     if (ret == CUDA_SUCCESS)
     {
-        add_gmem(*dptr, bytesize);
+        add_gmem(dptr, bytesize);
     }
     return ret;
 }
@@ -263,7 +263,7 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 
     if (ret == CUDA_SUCCESS)
     {
-        add_gmem(*dptr, bytesize);
+        add_gmem(dptr, bytesize);
     }
     
     // print_rnodes();
@@ -288,7 +288,7 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
 
     if (ret == CUDA_SUCCESS)
     {
-        add_gmem(*dptr, bytesize);
+        add_gmem(dptr, bytesize);
     }
     return ret;
 }
@@ -312,7 +312,7 @@ CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
 
     if (ret == CUDA_SUCCESS)
     {
-        add_gmem(*dptr, request_size);
+        add_gmem(dptr, request_size);
     }
 
     return ret;
@@ -335,7 +335,7 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
 
     if (ret == CUDA_SUCCESS)
     {
-        add_gmem(*dptr, request_size);
+        add_gmem(dptr, request_size);
     }
 
     return ret;

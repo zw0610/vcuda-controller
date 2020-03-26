@@ -23,12 +23,12 @@ extern "C" void print_rnodes(void) { rnm.print_rnodes(); }
 
 extern "C" void print_gmem(void) { rnm.print_gmem(); }
 
-extern "C" void add_gmem(unsigned long long dptr, const size_t bytes) {
-    rnm.add_gmem(dptr, bytes);
+extern "C" void add_gmem(CUdeviceptr* dptr, const size_t bytes) {
+    void* temp_ptr = static_cast<void*>(dptr);
+    rnm.add_gmem<CUdeviceptr>(temp_ptr, bytes);
 }
 
 extern "C" void free_gmem(unsigned long long dptr) {
-    std::cout << "trying to free gpu memory with ptr: " << dptr << std::endl;
     rnm.remove_gmem(dptr);
 }
 
