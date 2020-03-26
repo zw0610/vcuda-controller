@@ -223,14 +223,6 @@ CUresult cuLinkDestroy(CUlinkState state) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkDestroy, state);
 }
 
-CUresult cuMemFree_v2(CUdeviceptr dptr) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree_v2, dptr);
-}
-
-CUresult cuMemFree(CUdeviceptr dptr) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree, dptr);
-}
-
 CUresult cuMemGetAddressRange_v2(CUdeviceptr *pbase, size_t *psize,
                                  CUdeviceptr dptr) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetAddressRange_v2, pbase,
@@ -1355,6 +1347,7 @@ CUresult cuDeviceComputeCapability(int *major, int *minor, CUdevice dev) {
                          minor, dev);
 }
 
+// Mark: we might need to hijack cuDeviceGetProperties to modify the device memory
 CUresult cuDeviceGetProperties(CUdevprop *prop, CUdevice dev) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceGetProperties, prop, dev);
 }

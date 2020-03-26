@@ -27,6 +27,11 @@ extern "C" void add_gmem(unsigned long long dptr, const size_t bytes) {
     rnm.add_gmem(dptr, bytes);
 }
 
+extern "C" void free_gmem(unsigned long long dptr) {
+    std::cout << "trying to free gpu memory with ptr: " << dptr << std::endl;
+    rnm.remove_gmem(dptr);
+}
+
 extern "C" void set_process(const int pid) { rnm.set_process(pid); }
 
 extern "C" size_t get_shared_GPU_mem_limit(void) {

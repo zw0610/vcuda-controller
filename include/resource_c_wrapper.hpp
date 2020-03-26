@@ -19,6 +19,7 @@ extern "C" {
     void print_rnodes(void);
     void print_gmem(void);
     void add_gmem(unsigned long long, const size_t);
+    void free_gmem(unsigned long long);
     void set_process(const int);
 
     size_t get_shared_GPU_mem_limit(void); 

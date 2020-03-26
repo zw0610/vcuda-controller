@@ -188,6 +188,7 @@ typedef void (*atomic_fn_ptr)(int, void *);
 
 /** hijack entrypoint */
 CUresult cuDriverGetVersion(int *driverVersion) {
+    printf("%s\n", "hijacked cuDriverGetVersion is called!");
     CUresult ret;
 
     load_necessary_data();
@@ -209,10 +210,10 @@ CUresult cuInit(unsigned int flag) {
 
     load_necessary_data();
 
-//   pthread_once(&g_init_set, initialization);
+
 
     printf("%s\n", "hijacked cuInit is called!");
-
+//   pthread_once(&g_init_set, initialization);
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, flag);
 //   if (unlikely(ret)) {
 //     // goto DONE;
@@ -295,69 +296,74 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
 CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
                             size_t WidthInBytes, size_t Height,
                             unsigned int ElementSizeBytes) {
-//   size_t used = 0;
-//   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
+    printf("%s\n", "hijacked cuMemAllocPitch_v2 is called!");
+
+    const size_t used = get_gmem_used();
+    const size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
     CUresult ret;
 
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
-    printf("%s\n", "hijacked cuMemAllocPitch_v2 is called!");
+    if ((used + request_size) > get_shared_GPU_mem_limit())
+    {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+    
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch_v2, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem(*dptr, request_size);
+    }
+
     return ret;
 }
 
 CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
                          size_t Height, unsigned int ElementSizeBytes) {
-//   size_t used = 0;
-//   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
+    printf("%s\n", "hijacked cuMemAllocPitch is called!");
+    const size_t used = 0;
+    const size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
     CUresult ret;
 
-//   if (g_vcuda_config.enable) {
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
+    if ((used + request_size) > get_shared_GPU_mem_limit())
+    {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
 
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
-    printf("%s\n", "hijacked cuMemAllocPitch is called!");
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem(*dptr, request_size);
+    }
+
     return ret;
 }
 
 // static size_t get_array_base_size(int format) {
-//   size_t base_size = 0;
+//     size_t base_size = 0;
 
-//   switch (format) {
+//     switch (format) {
 //     case CU_AD_FORMAT_UNSIGNED_INT8:
 //     case CU_AD_FORMAT_SIGNED_INT8:
-//       base_size = 8;
-//       break;
+//         base_size = 8;
+//         break;
 //     case CU_AD_FORMAT_UNSIGNED_INT16:
 //     case CU_AD_FORMAT_SIGNED_INT16:
 //     case CU_AD_FORMAT_HALF:
-//       base_size = 16;
-//       break;
+//         base_size = 16;
+//         break;
 //     case CU_AD_FORMAT_UNSIGNED_INT32:
 //     case CU_AD_FORMAT_SIGNED_INT32:
 //     case CU_AD_FORMAT_FLOAT:
-//       base_size = 32;
-//       break;
+//         base_size = 32;
+//         break;
 //     default:
-//       base_size = 32;
-//   }
+//         base_size = 32;
+//     }
 
-//   return base_size;
+//     return base_size;
 // }
 
 // static CUresult cuArrayCreate_helper(const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
@@ -470,28 +476,32 @@ CUresult cuMipmappedArrayCreate(
     CUmipmappedArray *pHandle,
     const CUDA_ARRAY3D_DESCRIPTOR *pMipmappedArrayDesc,
     unsigned int numMipmapLevels) {
-//   size_t used = 0;
-//   size_t base_size = 0;
-//   size_t request_size = 0;
+
+    printf("%s\n", "hijacked cuMipmappedArrayCreate is called!");
+    
     CUresult ret;
 
-//   if (g_vcuda_config.enable) {
-//     base_size = get_array_base_size(pMipmappedArrayDesc->Format);
-//     request_size = base_size * pMipmappedArrayDesc->NumChannels *
-//                    pMipmappedArrayDesc->Height * pMipmappedArrayDesc->Width *
-//                    pMipmappedArrayDesc->Depth;
+    // const size_t base_size = get_array_base_size(pMipmappedArrayDesc->Format);
 
-//     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
+    // const size_t request_size = base_size * pMipmappedArrayDesc->NumChannels *
+    //                             pMipmappedArrayDesc->Height *
+    //                             pMipmappedArrayDesc->Width *
+    //                             pMipmappedArrayDesc->Depth;
 
-//     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//       ret = CUDA_ERROR_OUT_OF_MEMORY;
-//       goto DONE;
-//     }
-//   }
-    printf("%s\n", "hijacked cuMipmappedArrayCreate is called!");
+    // const size_t used = get_gmem_used();
+    // if ((used + request_size) > get_shared_GPU_mem_limit())
+    // {
+    //     return CUDA_ERROR_OUT_OF_MEMORY;
+    // }
+
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
                         pMipmappedArrayDesc, numMipmapLevels);
-// DONE:
+
+    // if (ret == CUDA_SUCCESS)
+    // {
+    //     add_gmem(*?, request_size);
+    // }    
+
     return ret;
 }
 
@@ -547,3 +557,14 @@ CUresult cuMemGetInfo(size_t *free, size_t *total) {
     return CUDA_SUCCESS;
 }
 
+CUresult cuMemFree_v2(CUdeviceptr dptr) {
+    printf("%s\n", "hijacked cuMemFree_v2 is called!");
+    free_gmem(dptr);
+    return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree_v2, dptr);
+}
+
+CUresult cuMemFree(CUdeviceptr dptr) {
+    printf("%s\n", "hijacked cuMemFree is called!");
+    free_gmem(dptr);
+    return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree, dptr);
+}

@@ -314,9 +314,17 @@ void RNM::remove_gmem_by_dptr(const int prev_idx, const int g_idx,
 }
 
 void RNM::remove_gmem(CUdeviceptr dptr) {
-    const pid_st key = std::make_tuple(pid, stime);
-    RNode *target_rn = find_rnode(key);
+    print_rnodes();
+    print_gmem();
 
+    const pid_st key = std::make_tuple(pid, stime);
+
+    RNode *target_rn = find_rnode(key);
+    if (target_rn == nullptr)
+    {
+        return;
+    }
+    
     remove_gmem_by_dptr(-1, target_rn->get_entry(), dptr);
 }
 
