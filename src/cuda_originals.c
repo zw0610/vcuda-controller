@@ -613,20 +613,11 @@ CUresult cuArray3DGetDescriptor(CUDA_ARRAY3D_DESCRIPTOR *pArrayDescriptor,
                          pArrayDescriptor, hArray);
 }
 
-CUresult cuArrayDestroy(CUarray hArray) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuArrayDestroy, hArray);
-}
-
 CUresult cuMipmappedArrayGetLevel(CUarray *pLevelArray,
                                   CUmipmappedArray hMipmappedArray,
                                   unsigned int level) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayGetLevel,
                          pLevelArray, hMipmappedArray, level);
-}
-
-CUresult cuMipmappedArrayDestroy(CUmipmappedArray hMipmappedArray) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayDestroy,
-                         hMipmappedArray);
 }
 
 CUresult cuTexRefCreate(CUtexref *pTexRef) {

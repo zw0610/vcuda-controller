@@ -308,13 +308,14 @@ void RNM::add_gmem(void* dptr, const std::size_t bytes) {
     }
 }
 
+template<typename T>
 void RNM::remove_gmem_by_dptr(const int prev_idx, const int g_idx,
-                              CUdeviceptr dptr) {
+                              T dptr) {
     if (ptr_gmem[g_idx].empty()) {
         return;
     }
     void* tmp_ptr = ptr_gmem[g_idx].ptr;
-    if (*static_cast<CUdeviceptr*>(tmp_ptr) == dptr) {
+    if (*static_cast<T*>(tmp_ptr) == dptr) {
         if (prev_idx == -1) {
             ptr_gmem[g_idx].shallow_delete();
         } else {
@@ -325,7 +326,8 @@ void RNM::remove_gmem_by_dptr(const int prev_idx, const int g_idx,
     remove_gmem_by_dptr(g_idx, ptr_gmem[g_idx].next, dptr);
 }
 
-void RNM::remove_gmem(CUdeviceptr dptr) {
+template<typename T>
+void RNM::remove_gmem(T dptr) {
     print_rnodes();
     print_gmem();
 
@@ -365,3 +367,11 @@ template void RNM::add_gmem<CUmipmappedArray>(void*, const std::size_t);
 template const int RNM::find_gmem<CUdeviceptr>(const RNode*, const CUdeviceptr) const;
 template const int RNM::find_gmem<CUarray>(const RNode*, const CUarray) const;
 template const int RNM::find_gmem<CUmipmappedArray>(const RNode*, const CUmipmappedArray) const;
+
+template void RNM::remove_gmem_by_dptr<CUdeviceptr>(const int, const int, CUdeviceptr);
+template void RNM::remove_gmem_by_dptr<CUarray>(const int, const int, CUarray);
+template void RNM::remove_gmem_by_dptr<CUmipmappedArray>(const int, const int, CUmipmappedArray);
+
+template void RNM::remove_gmem<CUdeviceptr>(CUdeviceptr);
+template void RNM::remove_gmem<CUarray>(CUarray);
+template void RNM::remove_gmem<CUmipmappedArray>(CUmipmappedArray);

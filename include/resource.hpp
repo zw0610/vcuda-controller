@@ -46,7 +46,8 @@ private:
     
     void link_rnode_gmem(RNode*, const int);
         
-    void remove_gmem_by_dptr(const int, const int, CUdeviceptr);
+    template<typename T>
+    void remove_gmem_by_dptr(const int, const int, T);
     
 public:
     RNM();
@@ -74,7 +75,8 @@ public:
     template<typename T>
     void add_gmem(void*, const std::size_t);
     
-    void remove_gmem(CUdeviceptr);
+    template<typename T>
+    void remove_gmem(T);
 
     std::size_t gmem_used(void); 
 };

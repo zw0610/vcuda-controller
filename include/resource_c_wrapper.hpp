@@ -1,11 +1,3 @@
-//
-//  resource_c_wrapper.hpp
-//  shmht
-//
-//  Created by Wang Zhang on 3/23/20.
-//  Copyright © 2020 Wang Zhang. All rights reserved.
-//
-
 #include <stdlib.h>
 #include <include/cuda-subset.h>
 
@@ -19,11 +11,15 @@ extern "C" {
     void RNM_init(const int, const int, const int);
     void print_rnodes(void);
     void print_gmem(void);
+    void set_process(const int);
+
     void add_gmem(CUdeviceptr*, const size_t);
     void add_gmem_cuarr(CUarray*, const size_t);
     void add_gmem_cumarr(CUmipmappedArray*, const size_t);
-    void free_gmem(unsigned long long);
-    void set_process(const int);
+
+    void free_gmem(CUdeviceptr);
+    void free_gmem_cuarr(CUarray);
+    void free_gmem_cumarr(CUmipmappedArray);
 
     size_t get_shared_GPU_mem_limit(void); 
     size_t get_gmem_used(void);

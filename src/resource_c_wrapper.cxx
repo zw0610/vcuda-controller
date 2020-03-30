@@ -1,11 +1,3 @@
-//
-//  resource_c_wrapper.c
-//  shmht
-//
-//  Created by Wang Zhang on 3/23/20.
-//  Copyright © 2020 Wang Zhang. All rights reserved.
-//
-
 #include "include/resource_c_wrapper.hpp"
 #include "include/resource.hpp"
 
@@ -38,8 +30,16 @@ extern "C" void add_gmem_cumarr(CUmipmappedArray* da, const size_t bytes) {
     rnm.add_gmem<CUmipmappedArray>(temp_arr, bytes);
 }
 
-extern "C" void free_gmem(unsigned long long dptr) {
-    rnm.remove_gmem(dptr);
+extern "C" void free_gmem(CUdeviceptr dptr) {
+    rnm.remove_gmem<CUdeviceptr>(dptr);
+}
+
+extern "C" void free_gmem_cuarr(CUarray da) {
+    rnm.remove_gmem<CUarray>(da);
+}
+
+extern "C" void free_gmem_cumarr(CUmipmappedArray da) {
+    rnm.remove_gmem<CUmipmappedArray>(da);
 }
 
 extern "C" void set_process(const int pid) { rnm.set_process(pid); }

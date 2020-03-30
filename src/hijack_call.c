@@ -33,158 +33,6 @@ extern char pid_path[];
 
 typedef void (*atomic_fn_ptr)(int, void *);
 
-// static pthread_once_t g_init_set = PTHREAD_ONCE_INIT;
-// static pthread_once_t g_register_set = PTHREAD_ONCE_INIT;
-
-// static uint32_t g_block_locker = 0;
-
-// static const struct timespec g_cycle = {
-//     .tv_sec = 0,
-//     .tv_nsec = TIME_TICK * MILLISEC,
-// };
-
-// static const struct timespec g_wait = {
-//     .tv_sec = 0,
-//     .tv_nsec = 120 * MILLISEC,
-// };
-
-/** pid mapping related */
-// static int g_pids_table[MAX_PIDS];
-// static int g_pids_table_size;
-
-/** internal function definition */
-
-// static void get_used_gpu_memory(int, void *);
-
-// static void initialization();
-
-// static const char *cuda_error(CUresult, const char **);
-
-// static int int_match(const void *, const void *);
-
-// /** helper function */
-// int int_match(const void *a, const void *b) {
-//   const int *ra = (const int *) a;
-//   const int *rb = (const int *) b;
-
-//   if (*ra < *rb) {
-//     return -1;
-//   }
-
-//   if (*ra > *rb) {
-//     return 1;
-//   }
-
-//   return 0;
-// }
-
-// static void atomic_action(const char *filename, atomic_fn_ptr fn_ptr,
-//                           void *arg) {
-//   int fd;
-
-//   fd = open(filename, O_RDONLY);
-//   if (unlikely(fd == -1)) {
-//     LOGGER(FATAL, "can't open %s, error %s", filename, strerror(errno));
-//   }
-
-//   fn_ptr(fd, arg);
-
-//   close(fd);
-// }
-
-// const char *cuda_error(CUresult code, const char **p) {
-//   CUDA_ENTRY_CALL(cuda_library_entry, cuGetErrorString, code, p);
-
-//   return *p;
-// }
-
-// static void load_pids_table(int fd, void *arg UNUSED) {
-// //   int item = 0;
-// //   int rsize = 0;
-// //   int i = 0;
-
-// //   for (item = 0; item < MAX_PIDS; item++) {
-// //     rsize = (int) read(fd, g_pids_table + item, sizeof(int));
-// //     if (unlikely(rsize != sizeof(int))) {
-// //       break;
-// //     }
-// //   }
-
-// //   for (i = 0; i < item; i++) {
-// //     LOGGER(8, "pid: %d", g_pids_table[i]);
-// //   }
-
-// //   g_pids_table_size = item;
-
-// //   LOGGER(8, "read %d items from %s", g_pids_table_size, pid_path);
-// }
-
-// static void get_used_gpu_memory(int fd, void *arg) {
-//   size_t *used_memory = arg;
-
-//   nvmlDevice_t dev;
-//   nvmlProcessInfo_t pids_on_device[MAX_PIDS];
-//   unsigned int size_on_device = MAX_PIDS;
-//   int ret;
-
-//   unsigned int i;
-
-//   load_pids_table(fd, NULL);
-//   NVML_ENTRY_CALL(nvml_library_entry, nvmlInit);
-
-//   ret =
-//       NVML_ENTRY_CALL(nvml_library_entry, nvmlDeviceGetHandleByIndex, 0, &dev);
-//   if (unlikely(ret)) {
-//     LOGGER(4, "nvmlDeviceGetHandleByIndex can't find device 0, return %d", ret);
-//     *used_memory = g_vcuda_config.gpu_memory;
-
-//     goto DONE;
-//   }
-
-//   ret =
-//       NVML_ENTRY_CALL(nvml_library_entry, nvmlDeviceGetComputeRunningProcesses,
-//                       dev, &size_on_device, pids_on_device);
-//   if (unlikely(ret)) {
-//     LOGGER(4,
-//            "nvmlDeviceGetComputeRunningProcesses can't get pids on device 0, "
-//            "return %d",
-//            ret);
-//     *used_memory = g_vcuda_config.gpu_memory;
-
-//     goto DONE;
-//   }
-
-//   for (i = 0; i < size_on_device; i++) {
-//     LOGGER(4, "summary: %d used %lld", pids_on_device[i].pid,
-//            pids_on_device[i].usedGpuMemory);
-//   }
-
-//   for (i = 0; i < size_on_device; i++) {
-//     if (bsearch(&pids_on_device[i].pid, g_pids_table, (size_t) g_pids_table_size,
-//                 sizeof(int), int_match)) {
-//       LOGGER(4, "%d use memory: %lld", pids_on_device[i].pid,
-//              pids_on_device[i].usedGpuMemory);
-//       *used_memory += pids_on_device[i].usedGpuMemory;
-//     }
-//   }
-
-//   LOGGER(4, "total used memory: %zu", *used_memory);
-
-// DONE:
-//   NVML_ENTRY_CALL(nvml_library_entry, nvmlShutdown);
-// }
-
-// static void initialization() {
-//   int ret;
-//   const char *cuda_err_string = NULL;
-
-//   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, 0);
-//   if (unlikely(ret)) {
-//     LOGGER(FATAL, "cuInit error %s",
-//            cuda_error((CUresult) ret, &cuda_err_string));
-//   }
-
-// }
 
 /** hijack entrypoint */
 CUresult cuDriverGetVersion(int *driverVersion) {
@@ -196,12 +44,7 @@ CUresult cuDriverGetVersion(int *driverVersion) {
 //   pthread_once(&g_init_set, initialization);
 
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuDriverGetVersion, driverVersion);
-//   if (unlikely(ret)) {
-//     // goto DONE;
-//     return ret;
-//   }
 
-// DONE:
     return ret;
 }
 
@@ -215,12 +58,7 @@ CUresult cuInit(unsigned int flag) {
     printf("%s\n", "hijacked cuInit is called!");
 //   pthread_once(&g_init_set, initialization);
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuInit, flag);
-//   if (unlikely(ret)) {
-//     // goto DONE;
-//     return ret;
-//   }
 
-// // DONE:
     return ret;
 }
 
@@ -373,14 +211,6 @@ cuArrayCreate_helper(const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
     base_size = get_array_base_size(pAllocateArray->Format);
     return base_size * pAllocateArray->NumChannels *
                    pAllocateArray->Height * pAllocateArray->Width;
-
-    // const size_t used = get_gmem_used();
-
-    // if ((used + request_size) > get_shared_GPU_mem_limit()) {
-    //     ret = CUDA_ERROR_OUT_OF_MEMORY;
-    // }
-
-    // return ret;
 }
 
 CUresult cuArrayCreate_v2(CUarray *pHandle,
@@ -578,4 +408,13 @@ CUresult cuMemFree(CUdeviceptr dptr) {
     printf("%s\n", "hijacked cuMemFree is called!");
     free_gmem(dptr);
     return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree, dptr);
+}
+
+CUresult cuArrayDestroy(CUarray hArray) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuArrayDestroy, hArray);
+}
+
+CUresult cuMipmappedArrayDestroy(CUmipmappedArray hMipmappedArray) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayDestroy,
+                         hMipmappedArray);
 }
