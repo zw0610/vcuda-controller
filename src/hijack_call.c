@@ -341,134 +341,146 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
     return ret;
 }
 
-// static size_t get_array_base_size(int format) {
-//     size_t base_size = 0;
+static size_t get_array_base_size(int format) {
+    size_t base_size = 0;
 
-//     switch (format) {
-//     case CU_AD_FORMAT_UNSIGNED_INT8:
-//     case CU_AD_FORMAT_SIGNED_INT8:
-//         base_size = 8;
-//         break;
-//     case CU_AD_FORMAT_UNSIGNED_INT16:
-//     case CU_AD_FORMAT_SIGNED_INT16:
-//     case CU_AD_FORMAT_HALF:
-//         base_size = 16;
-//         break;
-//     case CU_AD_FORMAT_UNSIGNED_INT32:
-//     case CU_AD_FORMAT_SIGNED_INT32:
-//     case CU_AD_FORMAT_FLOAT:
-//         base_size = 32;
-//         break;
-//     default:
-//         base_size = 32;
-//     }
+    switch (format) {
+    case CU_AD_FORMAT_UNSIGNED_INT8:
+    case CU_AD_FORMAT_SIGNED_INT8:
+        base_size = 8;
+        break;
+    case CU_AD_FORMAT_UNSIGNED_INT16:
+    case CU_AD_FORMAT_SIGNED_INT16:
+    case CU_AD_FORMAT_HALF:
+        base_size = 16;
+        break;
+    case CU_AD_FORMAT_UNSIGNED_INT32:
+    case CU_AD_FORMAT_SIGNED_INT32:
+    case CU_AD_FORMAT_FLOAT:
+        base_size = 32;
+        break;
+    default:
+        base_size = 32;
+    }
 
-//     return base_size;
-// }
+    return base_size;
+}
 
-// static CUresult cuArrayCreate_helper(const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
-//     // size_t used = 0;
-//     // size_t base_size = 0;
-//     // size_t request_size = 0;
-//     CUresult ret = CUDA_SUCCESS;
+static size_t
+cuArrayCreate_helper(const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
+    size_t base_size = 0;
 
+    base_size = get_array_base_size(pAllocateArray->Format);
+    return base_size * pAllocateArray->NumChannels *
+                   pAllocateArray->Height * pAllocateArray->Width;
 
-//     // base_size = get_array_base_size(pAllocateArray->Format);
-//     // request_size = base_size * pAllocateArray->NumChannels *
-//     //                pAllocateArray->Height * pAllocateArray->Width;
+    // const size_t used = get_gmem_used();
 
-//     // atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
+    // if ((used + request_size) > get_shared_GPU_mem_limit()) {
+    //     ret = CUDA_ERROR_OUT_OF_MEMORY;
+    // }
 
-//     // if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-//     //     ret = CUDA_ERROR_OUT_OF_MEMORY;
-//     //     goto DONE;
-//     // }
-
-
-// // DONE:
-//     return ret;
-// }
+    // return ret;
+}
 
 CUresult cuArrayCreate_v2(CUarray *pHandle,
                           const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
+    printf("%s\n", "hijacked cuArrayCreate_v2 is called!");
     CUresult ret;
 
-//   ret = cuArrayCreate_helper(pAllocateArray);
-//   if (ret != CUDA_SUCCESS) {
-//     goto DONE;
-//   }
-    printf("%s\n", "hijacked cuArrayCreate_v2 is called!");
+    const size_t request_size = cuArrayCreate_helper(pAllocateArray);
+    const size_t used = get_gmem_used();
+
+    if ((used + request_size) > get_shared_GPU_mem_limit()) {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+    
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate_v2, pHandle,
                         pAllocateArray);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem_cuarr(pHandle, request_size);
+    }
+
     return ret;
 }
 
 CUresult cuArrayCreate(CUarray *pHandle,
                        const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
+    printf("%s\n", "hijacked cuArrayCreate is called!");
     CUresult ret;
 
-//   ret = cuArrayCreate_helper(pAllocateArray);
-//   if (ret != CUDA_SUCCESS) {
-//     goto DONE;
-//   }
-    printf("%s\n", "hijacked cuArrayCreate is called!");
+    const size_t request_size = cuArrayCreate_helper(pAllocateArray);
+    const size_t used = get_gmem_used();
+
+    if ((used + request_size) > get_shared_GPU_mem_limit()) {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+    
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate, pHandle,
                         pAllocateArray);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem_cuarr(pHandle, request_size);
+    }
+
     return ret;
 }
 
-// static CUresult cuArray3DCreate_helper(const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
-// //   size_t used = 0;
-// //   size_t base_size = 0;
-// //   size_t request_size = 0;
-//   CUresult ret = CUDA_SUCCESS;
+static size_t
+cuArray3DCreate_helper(const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
+    size_t base_size = 0;
 
-// //   if (g_vcuda_config.enable) {
-// //     base_size = get_array_base_size(pAllocateArray->Format);
-// //     request_size = base_size * pAllocateArray->NumChannels *
-// //                    pAllocateArray->Height * pAllocateArray->Width;
-
-// //     atomic_action(pid_path, get_used_gpu_memory, (void *) &used);
-
-// //     if (unlikely(used + request_size > g_vcuda_config.gpu_memory)) {
-// //       ret = CUDA_ERROR_OUT_OF_MEMORY;
-// //       goto DONE;
-// //     }
-// //   }
-
-// // DONE:
-//   return ret;
-// }
+    base_size = get_array_base_size(pAllocateArray->Format);
+    return base_size * pAllocateArray->NumChannels * pAllocateArray->Height *
+           pAllocateArray->Width;
+}
 
 CUresult cuArray3DCreate_v2(CUarray *pHandle,
                             const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
+    printf("%s\n", "hijacked cuArray3DCreate_v2 is called!");
     CUresult ret;
 
-//   ret = cuArray3DCreate_helper(pAllocateArray);
-//   if (ret != CUDA_SUCCESS) {
-//     goto DONE;
-//   }
-    printf("%s\n", "hijacked cuArray3DCreate_v2 is called!");
+    const size_t request_size = cuArray3DCreate_helper(pAllocateArray);
+    const size_t used = get_gmem_used();
+
+    if ((used + request_size) > get_shared_GPU_mem_limit()) {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+    
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate_v2, pHandle,
                         pAllocateArray);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem_cuarr(pHandle, request_size);
+    }
+
     return ret;
 }
 
 CUresult cuArray3DCreate(CUarray *pHandle,
                          const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
+    printf("%s\n", "hijacked cuArray3DCreate is called!");
     CUresult ret;
 
-//   ret = cuArray3DCreate_helper(pAllocateArray);
-//   if (ret != CUDA_SUCCESS) {
-//     goto DONE;
-//   }
-    printf("%s\n", "hijacked cuArray3DCreate is called!");
+    const size_t request_size = cuArray3DCreate_helper(pAllocateArray);
+    const size_t used = get_gmem_used();
+
+    if ((used + request_size) > get_shared_GPU_mem_limit()) {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate, pHandle,
                         pAllocateArray);
-// DONE:
+
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem_cuarr(pHandle, request_size);
+    }
+
     return ret;
 }
 
@@ -478,29 +490,28 @@ CUresult cuMipmappedArrayCreate(
     unsigned int numMipmapLevels) {
 
     printf("%s\n", "hijacked cuMipmappedArrayCreate is called!");
-    
     CUresult ret;
 
-    // const size_t base_size = get_array_base_size(pMipmappedArrayDesc->Format);
+    const size_t base_size = get_array_base_size(pMipmappedArrayDesc->Format);
 
-    // const size_t request_size = base_size * pMipmappedArrayDesc->NumChannels *
-    //                             pMipmappedArrayDesc->Height *
-    //                             pMipmappedArrayDesc->Width *
-    //                             pMipmappedArrayDesc->Depth;
+    const size_t request_size = base_size * pMipmappedArrayDesc->NumChannels *
+                                pMipmappedArrayDesc->Height *
+                                pMipmappedArrayDesc->Width *
+                                pMipmappedArrayDesc->Depth;
 
-    // const size_t used = get_gmem_used();
-    // if ((used + request_size) > get_shared_GPU_mem_limit())
-    // {
-    //     return CUDA_ERROR_OUT_OF_MEMORY;
-    // }
+    const size_t used = get_gmem_used();
+    if ((used + request_size) > get_shared_GPU_mem_limit())
+    {
+        return CUDA_ERROR_OUT_OF_MEMORY;
+    }
 
     ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
                         pMipmappedArrayDesc, numMipmapLevels);
 
-    // if (ret == CUDA_SUCCESS)
-    // {
-    //     add_gmem(*?, request_size);
-    // }    
+    if (ret == CUDA_SUCCESS)
+    {
+        add_gmem_cumarr(pHandle, request_size);
+    }    
 
     return ret;
 }

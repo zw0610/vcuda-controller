@@ -28,6 +28,16 @@ extern "C" void add_gmem(CUdeviceptr* dptr, const size_t bytes) {
     rnm.add_gmem<CUdeviceptr>(temp_ptr, bytes);
 }
 
+extern "C" void add_gmem_cuarr(CUarray* da, const size_t bytes) {
+    void* temp_arr = static_cast<void*>(da);
+    rnm.add_gmem<CUarray>(temp_arr, bytes);
+}
+
+extern "C" void add_gmem_cumarr(CUmipmappedArray* da, const size_t bytes) {
+    void* temp_arr = static_cast<void*>(da);
+    rnm.add_gmem<CUmipmappedArray>(temp_arr, bytes);
+}
+
 extern "C" void free_gmem(unsigned long long dptr) {
     rnm.remove_gmem(dptr);
 }

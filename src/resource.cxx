@@ -8,6 +8,8 @@
 #include <sstream>
 #include <string>
 
+#include "include/cuda-subset.h"
+
 std::ostream &operator<<(std::ostream &os, const RNode &rn) {
     os << "PID: " << rn.pid << " time: " << rn.t
        << " res_entry_idx: " << rn.res_entry_idx;
@@ -357,4 +359,9 @@ std::size_t RNM::gmem_used(void) {
 }
 
 template void RNM::add_gmem<CUdeviceptr>(void*, const std::size_t);
+template void RNM::add_gmem<CUarray>(void*, const std::size_t);
+template void RNM::add_gmem<CUmipmappedArray>(void*, const std::size_t);
+
 template const int RNM::find_gmem<CUdeviceptr>(const RNode*, const CUdeviceptr) const;
+template const int RNM::find_gmem<CUarray>(const RNode*, const CUarray) const;
+template const int RNM::find_gmem<CUmipmappedArray>(const RNode*, const CUmipmappedArray) const;

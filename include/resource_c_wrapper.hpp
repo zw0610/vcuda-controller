@@ -20,6 +20,8 @@ extern "C" {
     void print_rnodes(void);
     void print_gmem(void);
     void add_gmem(CUdeviceptr*, const size_t);
+    void add_gmem_cuarr(CUarray*, const size_t);
+    void add_gmem_cumarr(CUmipmappedArray*, const size_t);
     void free_gmem(unsigned long long);
     void set_process(const int);
 

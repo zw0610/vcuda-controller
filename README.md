@@ -1,16 +1,21 @@
 # vcuda-controller
 
-[![Build Status](https://travis-ci.org/tkestack/vcuda-controller.svg)](https://travis-ci.org/tkestack/vcuda-controller)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/tkestack/vcuda-controller.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tkestack/vcuda-controller/alerts/)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/tkestack/vcuda-controller.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tkestack/vcuda-controller/context:cpp)
+Caicloud customized implementation of [vcuda-control](https://github.com/tkestack/vcuda-controller). 
 
-This project is a wrapper of NVIDIA driver library, it's a component of [gpu-manager](https://github.com/tkestack/gpu-manager) which
-makes Kubernetes can not only run more than one Pod on the same GPU, but also give QoS guaranteed to each Pod. For more details, please
-refer to our paper [here](https://ieeexplore.ieee.org/abstract/document/8672318).
+We decoupled the CUDA Driver API hijack part from TKE stack, dding memory tracking system for accounting GPU memory usage.
 
+
+## Design
+
+Please refer the [Google Docs](https://docs.google.com/document/d/1UX6nEOVFCtyNGGrQLdYnDWVche98pbfhPDwBgYa5AP8/edit) for design.
 
 ## Build
 
+```shell
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
 ```
-IMAGE_FILE=<your image name without version> ./build-img.sh
-```
+
+For more details on build, please check the Dockerfile.
